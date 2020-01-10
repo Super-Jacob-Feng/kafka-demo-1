@@ -1,4 +1,0 @@
-com/example/producer/model/SendBody.class
-com/example/producer/DemoApplication.class
-com/example/producer/controller/ProducerController.class
-com/example/producer/config/KafkaConfig.class

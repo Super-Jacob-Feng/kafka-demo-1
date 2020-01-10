@@ -1,0 +1,140 @@
+version: "2.1"
+
+services:
+  zookeeper:
+    image: zookeeper:latest
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+    volumes:
+      - /opt/docker/zookeeper/conf:/conf
+      - /opt/docker/zookeeper/data:/data
+      - /opt/docker/zookeeper/datalog:/datalog
+
+  kafka1:
+    image: wurstmeister/kafka:latest
+    container_name: kafka1
+    ports:
+      - "9091:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: kafka1
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_HOST_NAME: kafka1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://kafka1:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092
+      KAFKA_CREATE_TOPICS: "CollaborationTopic:3:1,ShoppingCartTopic:2:1,NotificationTopic:2:1"
+      KAFKA_AUTO_CREATE_TOPIC_ENABLE: "false"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/docker/kafka/data1:/kafka
+      # - /opt/docker/kafka/config1:/opt/kafka/config
+      # - /opt/docker/kafka/logs1:/opt/kafka/logs
+    depends_on:
+      - zookeeper
+
+  kafka2:
+    image: wurstmeister/kafka:latest
+    container_name: kafka2
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_HOST_NAME: kafka2
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_HOST_NAME: kafka2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://kafka2:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092
+      KAFKA_CREATE_TOPICS: "CollaborationTopic:3:1,ShoppingCartTopic:2:1,NotificationTopic:2:1"
+      KAFKA_AUTO_CREATE_TOPIC_ENABLE: "false"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/docker/kafka/data2:/kafka
+      # - /opt/docker/kafka/config2:/opt/kafka/config
+      # - /opt/docker/kafka/logs2:/opt/kafka/logs
+    depends_on:
+      - zookeeper
+
+  kafka3:
+    image: wurstmeister/kafka:latest
+    container_name: kafka3
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_HOST_NAME: kafka3
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_HOST_NAME: kafka3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://kafka3:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092
+      KAFKA_CREATE_TOPICS: "CollaborationTopic:3:1,ShoppingCartTopic:2:1,NotificationTopic:2:1"
+      KAFKA_AUTO_CREATE_TOPIC_ENABLE: "false"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/docker/kafka/data3:/kafka
+      # - /opt/docker/kafka/config3:/opt/kafka/config
+      # - /opt/docker/kafka/logs3:/opt/kafka/logs
+    depends_on:
+      - zookeeper
+
+  kafka-manager:
+    container_name: kafka-manager
+    image: sheepkiller/kafka-manager
+    ports:
+      - "9000:9000"
+    environment:
+      ZK_HOSTS: zookeeper:2181
+
+  producer:
+    image: producer:latest
+    container_name: producer
+    hostname: producer
+    ports:
+      - "8080:8080"
+    links:
+      - kafka1:kafka1
+      - kafka2:kafka2
+      - kafka3:kafka3
+
+  consumer1:
+    image: consumer:1
+    container_name: consumer1
+    hostname: consumer1
+    ports:
+      - "8081:8080"
+    links:
+      - kafka1:kafka1
+      - kafka2:kafka2
+      - kafka3:kafka3
+
+  consumer2:
+    image: consumer:2
+    container_name: consumer2
+    hostname: consumer2
+    ports:
+      - "8082:8080"
+    links:
+      - kafka1:kafka1
+      - kafka2:kafka2
+      - kafka3:kafka3
+
+  consumer3:
+    image: consumer:3
+    container_name: consumer3
+    hostname: consumer3
+    ports:
+      - "8083:8080"
+    links:
+      - kafka1:kafka1
+      - kafka2:kafka2
+      - kafka3:kafka3

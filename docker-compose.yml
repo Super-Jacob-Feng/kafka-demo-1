@@ -96,6 +96,7 @@ services:
       ZK_HOSTS: zookeeper:2181
 
   producer:
+    build: ./producer
     image: producer:latest
     container_name: producer
     hostname: producer
@@ -107,6 +108,7 @@ services:
       - kafka3:kafka3
 
   consumer1:
+    build: ./consumer_1
     image: consumer:1
     container_name: consumer1
     hostname: consumer1
@@ -118,6 +120,7 @@ services:
       - kafka3:kafka3
 
   consumer2:
+    build: ./consumer_1
     image: consumer:2
     container_name: consumer2
     hostname: consumer2
@@ -129,6 +132,7 @@ services:
       - kafka3:kafka3
 
   consumer3:
+    build: ./consumer_2
     image: consumer:3
     container_name: consumer3
     hostname: consumer3
